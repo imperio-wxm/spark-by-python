@@ -24,9 +24,10 @@ path = os.path.join(tempdir, "WordCount.txt")
 
 textFile = sc.textFile(path)
 # print textFile.collect()
-result = textFile.flatMap(lambda x: x.split(' ')).map(lambda x: (x, 1)).reduceByKey(add)
-output = sorted(result.collect(),key=lambda x:x[1],reverse=True)
+result = textFile.flatMap(lambda x: x.split(' ')).map(lambda x: (x, 1)).\
+    reduceByKey(add).map(lambda x:(x[1],x[0])).sortByKey(False).map(lambda x:(x[1],x[0]))
+output = result.collect()
 # print output
 
 for key,value in output:
-    print key.encode('utf-8') + ' frequency:',value
+    print key ,value
