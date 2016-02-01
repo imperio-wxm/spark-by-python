@@ -31,3 +31,5 @@ output = result.collect()
 
 for key,value in output:
     print key ,value
+
+sc.stop()
