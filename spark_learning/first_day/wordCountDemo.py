@@ -6,7 +6,7 @@ from pyspark import SparkContext,SparkConf
 from operator import add
 import os
 
-#WordCount.txt
+# WordCount.txt
 """
 Hello World Bye World
 Spark Spark Spark
@@ -23,10 +23,10 @@ tempdir = '/home'
 path = os.path.join(tempdir, "WordCount.txt")
 
 textFile = sc.textFile(path)
-#print textFile.collect()
+# print textFile.collect()
 result = textFile.flatMap(lambda x: x.split(' ')).map(lambda x: (x, 1)).reduceByKey(add)
 output = sorted(result.collect(),key=lambda x:x[1],reverse=True)
-#print output
+# print output
 
 for key,value in output:
     print key.encode('utf-8') + ' frequency:',value
