@@ -5,17 +5,6 @@ __author__ = 'wxmimperio'
 from pyspark import SparkContext,SparkConf
 from operator import add
 from os import path
-import os
-
-# WordCount.txt
-"""
-Hello World Bye World
-Spark Spark Spark
-Hadoop Hadoop Hadoop
-Tachyon Tachyon Tachyon Tachyon
-Kafka Kafka Kafka Kafka Kafka Kafka
-This is a demo project.
-"""
 
 conf = SparkConf().setAppName("sparkDemo").setMaster("local")
 sc = SparkContext(conf=conf)
