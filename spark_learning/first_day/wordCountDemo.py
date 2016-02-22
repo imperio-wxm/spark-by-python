@@ -22,6 +22,7 @@ sc = SparkContext(conf=conf)
 tempdir = '/home'
 path = os.path.join(tempdir, "WordCount.txt")
 
+# 读取过来转换成RDD（RDD是分区的）
 textFile = sc.textFile(path)
 # print textFile.collect()
 result = textFile.flatMap(lambda x: x.split(' ')).map(lambda x: (x, 1)).\
