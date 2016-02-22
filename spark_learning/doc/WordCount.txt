@@ -1,0 +1,6 @@
+Hello World Bye World
+Spark Spark Spark
+Hadoop Hadoop Hadoop
+Tachyon Tachyon Tachyon Tachyon
+Kafka Kafka Kafka Kafka Kafka Kafka
+This is a demo project.
