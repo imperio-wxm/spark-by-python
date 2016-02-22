@@ -10,9 +10,9 @@ conf = SparkConf().setAppName("sparkDemo").setMaster("local")
 sc = SparkContext(conf=conf)
 
 dirname = path.dirname(path.dirname(__file__))
-tempdir = '/home'
+filename = 'WordCount.txt'
 #path = os.path.join(tempdir, "WordCount.txt")
-path = '/'.join([dirname,'doc','WordCount.txt'])
+path = '/'.join([dirname,'doc',filename])
 
 # 读取过来转换成RDD（RDD是分区的）
 textFile = sc.textFile(path)
