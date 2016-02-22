@@ -27,6 +27,7 @@ textFile = sc.textFile(path)
 # print textFile.collect()
 result = textFile.flatMap(lambda x: x.split(' ')).map(lambda x: (x, 1)).\
     reduceByKey(add).map(lambda x:(x[1],x[0])).sortByKey(False).map(lambda x:(x[1],x[0]))
+# 多个RDD可并行操作
 output = result.collect()
 # print output
 
