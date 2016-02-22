@@ -4,6 +4,7 @@ __author__ = 'wxmimperio'
 
 from pyspark import SparkContext,SparkConf
 from operator import add
+from os import path
 import os
 
 # WordCount.txt
@@ -19,8 +20,10 @@ This is a demo project.
 conf = SparkConf().setAppName("sparkDemo").setMaster("local")
 sc = SparkContext(conf=conf)
 
+dirname = path.dirname(path.dirname(__file__))
 tempdir = '/home'
-path = os.path.join(tempdir, "WordCount.txt")
+#path = os.path.join(tempdir, "WordCount.txt")
+path = '/'.join([dirname,'doc','WordCount.txt'])
 
 # 读取过来转换成RDD（RDD是分区的）
 textFile = sc.textFile(path)
