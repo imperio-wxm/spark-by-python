@@ -16,7 +16,7 @@ path = '/'.join([dirname,'doc',filename])
 
 textFile = sc.textFile(path)
 
-words_count =textFile.map(lambda line: len(re.split('\s.',line))).reduce(lambda a, b: a if(a > b) else b)
+words_count =textFile.map(lambda line: len(re.split('(\\s*,\\s*|\\s+)',line))).reduce(lambda a, b: a if(a > b) else b)
 
 #words_count = textFile.map(lambda line: len(line)).collect()
 
