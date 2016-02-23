@@ -23,3 +23,5 @@ words_count =textFile.map(lambda line: len(re.split('(\\s*,\\s*|\\s+)',line))).r
 #words_count = textFile.map(lambda line: len(line)).collect()
 
 print words_count
+
+sc.stop()
