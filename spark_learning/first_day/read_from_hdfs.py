@@ -18,14 +18,16 @@ result = textFile.flatMap(lambda x: x.split(' ')).map(lambda x: (x, 1)).\
 output = result.collect()
 # print output
 
-for key,value in output:
-    print key ,value
+def output_result(output):
+    #for key,value in output:
+        #print key ,value
+    print output
 
-for x in output:
-    print x
+# 调用foreach
+result.foreach(output_result)
 
 # 保存到HDFS
-result.saveAsTextFile('hdfs://localhost:9000/test/output_1')
+#result.saveAsTextFile('hdfs://localhost:9000/test/output_1')
 
 sc.stop()
 
