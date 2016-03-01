@@ -36,6 +36,7 @@ INFO storage.MemoryStore: Block broadcast_3_piece0 stored as bytes in memory (es
 INFO storage.BlockManagerInfo: Added broadcast_3_piece0 in memory on localhost:46823 (size: 4.5 KB, free: 530.3 MB)
 """
 result.cache()
+result.collect()
 
 # 保存到HDFS
 #result.saveAsTextFile('hdfs://localhost:9000/test/output_1')
