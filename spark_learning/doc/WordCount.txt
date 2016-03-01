@@ -4,3 +4,4 @@ Hadoop Hadoop Hadoop
 Tachyon Tachyon Tachyon Tachyon
 Kafka Kafka Kafka Kafka Kafka Kafka
 This is a demo project.
+中国 亚洲 韩国 日本 美国
