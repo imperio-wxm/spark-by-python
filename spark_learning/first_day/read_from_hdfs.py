@@ -21,6 +21,12 @@ output = result.collect()
 for key,value in output:
     print key ,value
 
+for x in output:
+    print x
+
+# 保存到HDFS
+result.saveAsTextFile('hdfs://localhost:9000/test/output_1')
+
 sc.stop()
 
 
