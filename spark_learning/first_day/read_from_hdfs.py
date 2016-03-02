@@ -4,9 +4,12 @@ __author__ = 'wxmimperio'
 
 from pyspark import SparkContext,SparkConf
 from operator import add
-from os import path
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
-conf = SparkConf().setAppName("sparkDemo").setMaster("local")
+# standalone模式
+conf = SparkConf().setAppName("sparkDemo").setMaster('spark://spark-master:7077')
 sc = SparkContext(conf=conf)
 
 # 读取过来转换成RDD（RDD是分区的）
@@ -20,7 +23,7 @@ output = result.collect()
 
 def output_result(output):
     for key,value in output:
-        print key ,value
+        print key.decode('utf-8') ,value
 
 # 调用foreach
 #result.foreach(output_result)
