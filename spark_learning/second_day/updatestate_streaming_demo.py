@@ -21,7 +21,7 @@ if __name__ == "__main__":
     conf = SparkConf().setAppName("update_state").setMaster("local[2]")
     sc = SparkContext(conf=conf)
     ssc = StreamingContext(sc, 3)
-    # 设置checkpoint
+    # 设置checkpoint到hdfs上
     ssc.checkpoint("hdfs://localhost:9000/checkpiont/streaming_cp_log")
 
     lines = ssc.socketTextStream("spark-master", 9999)
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     wordCounts = lines.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1))\
         .reduceByKey(lambda x,y: x+y)
 
-    # 传入函数
+    # 传入函数，每次计算的都是重复值的累加
     stateDstream = wordCounts.updateStateByKey(updateFunction)
     stateDstream.pprint()
 
