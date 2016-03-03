@@ -5,6 +5,10 @@ __author__ = 'wxmimperio'
 from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 
+"""
+spark streaming 有状态操作
+会记录以前的数据
+"""
 if __name__ == "__main__":
 
     # 设置累计计算函数

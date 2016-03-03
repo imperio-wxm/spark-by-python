@@ -8,6 +8,11 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+"""
+spark streaming 无状态操作
+只对当前时间块划分的RDD进行操作
+"""
+
 if __name__ == "__main__":
     conf = SparkConf().setAppName("spark_streaming_demo").setMaster("local[2]")
     sc = SparkContext(conf=conf)
