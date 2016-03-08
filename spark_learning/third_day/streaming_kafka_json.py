@@ -37,7 +37,7 @@ if __name__ == "__main__":
     def toJson(lines):
         line = json.loads(lines[1].encode("UTF-8"))
         #print type(line["oid"].encode("utf-8"))
-        return [line["oid"].encode("utf-8")]
+        return [line["oid"].encode("utf-8"),line["warring_state"].decode("utf-8")]
 
     # 对oid进行统计个数
     lines = kvs.flatMap(lambda x: toJson(x)).map(lambda word:(word, 1)).reduceByKey(lambda x,y: x+y)
