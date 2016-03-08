@@ -7,7 +7,6 @@ from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 import json
 import sys
-from pyspark.sql import SQLContext
 
 if __name__ == "__main__":
     reload(sys)
@@ -16,21 +15,34 @@ if __name__ == "__main__":
     conf = SparkConf().setMaster("local[2]").setAppName("streaming_kafka_json")
     sc = SparkContext(conf=conf)
     ssc = StreamingContext(sc, 5)
-
-    sqlC = SQLContext(sc)
+    ssc.checkpoint("hdfs://localhost:9000/checkpiont/streaming_cp_log")
 
     kvs = KafkaUtils.createDirectStream(ssc, ["realdata_receive"], {"metadata.broker.list": "192.168.108.222:9092"})
+
+    # 设置累计计算函数
+    def updateFunction(newValues, runningCount):
+        """
+        :param newValues: 新值
+        :param runningCount: 传进的值
+        :return: 计数累加
+        """
+        if runningCount is None:
+            runningCount = 0
+        return sum(newValues, runningCount)
 
 
     # 1. lines是一个元组，lines[1]取第二个元素
     # 2. 默认为unicode编码，转换成utf-8
     # 3. json.loads()转换成json
     def toJson(lines):
-        line = json.loads(lines[1].encode("utf-8"))
-        print line["oid"]
+        line = json.loads(lines[1].encode("UTF-8"))
+        #print type(line["oid"].encode("utf-8"))
+        return [line["oid"].encode("utf-8")]
 
-    lines = kvs.map(lambda x: toJson(x))
-    lines.pprint()
+    # 对oid进行统计个数
+    lines = kvs.flatMap(lambda x: toJson(x)).map(lambda word:(word, 1)).reduceByKey(lambda x,y: x+y)
+    stateDstream = lines.updateStateByKey(updateFunction)
+    stateDstream.pprint()
 
     offsetRanges = []
 
