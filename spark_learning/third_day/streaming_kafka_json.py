@@ -26,10 +26,12 @@ if __name__ == "__main__":
         :param runningCount: 传进的值
         :return: 计数累加
         """
+        count = 0
         if runningCount is None:
             runningCount = 0
+        else:
+            count += 1
         return sum(newValues, runningCount)
-
 
     # 1. lines是一个元组，lines[1]取第二个元素
     # 2. 默认为unicode编码，转换成utf-8
@@ -37,7 +39,7 @@ if __name__ == "__main__":
     def toJson(lines):
         line = json.loads(lines[1].encode("UTF-8"))
         #print type(line["oid"].encode("utf-8"))
-        return [line["oid"].encode("utf-8"),line["warring_state"].decode("utf-8")]
+        return [line["oid"].encode("utf-8")]
 
     # 对oid进行统计个数
     lines = kvs.flatMap(lambda x: toJson(x)).map(lambda word:(word, 1)).reduceByKey(lambda x,y: x+y)
