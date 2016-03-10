@@ -15,14 +15,16 @@ def updateFun(newValues, runningCount):
     return sum(newValues, runningCount)
 
 def sumFun(lines):
-    global count
-    count += 1
-    print "count=========" + str(count)
-
     line = json.loads(lines[1].encode("UTF-8"))
     #print type(line["oid"].encode("utf-8"))
     # return {"oid":line["oid"].encode("utf-8"),"value":line["value"]}
     return ("value", line["value"])
+
+def reduceFun(rdds):
+    global count
+    for rdd in rdds.offsetRanges():
+        count += 1
+        print "count================" + str(count)
 
 if __name__ == "__main__":
     setDefaultEncoding()
@@ -30,8 +32,10 @@ if __name__ == "__main__":
     ssc.checkpoint("hdfs://localhost:9000/checkpiont/streaming_cp_log")
 
     kvs = KafkaUtils.createDirectStream(ssc, ["realdata_receive"], {"metadata.broker.list": "192.168.108.222:9092"})
-    kvs.map(lambda value: sumFun(value)).reduceByKey(lambda x,y: x+y).\
+    kvs.map(lambda value: sumFun(value)).reduceByKey(reduceFun).\
         updateStateByKey(updateFun).pprint()
+
+    kvs.foreachRDD(reduceFun)
 
     ensureOffset(kvs=kvs)
 
