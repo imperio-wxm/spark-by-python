@@ -26,11 +26,13 @@ if __name__ == "__main__":
         :param runningCount: 传进的值
         :return: 计数累加
         """
-        count = 0
         if runningCount is None:
             runningCount = 0
-        else:
-            count += 1
+        print "**********************************"
+        print newValues
+        print "=================================="
+        print runningCount
+        print "++++++++++++++++++++++++++++++++++"
         return sum(newValues, runningCount)
 
     # 1. lines是一个元组，lines[1]取第二个元素
