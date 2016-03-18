@@ -23,7 +23,7 @@ def setDefaultEncoding():
     reload(sys)
     sys.setdefaultencoding("utf-8")
 
-def initSparkContext(appName, masterName, scTime):
+def initStreamingContext(appName, masterName, scTime):
     conf = SparkConf().setAppName(appName).setMaster(masterName)
     sc = SparkContext(conf=conf)
     ssc = StreamingContext(sc, scTime)

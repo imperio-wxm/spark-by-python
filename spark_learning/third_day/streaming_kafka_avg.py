@@ -4,7 +4,7 @@ __author__ = 'wxmimperio'
 
 from pyspark.streaming.kafka import KafkaUtils
 # utils.default_utils的import必须将utils文件夹复制到spark目录下的python文件夹内才能引用成功
-from utils.default_utils import setDefaultEncoding, initSparkContext, ensureOffset
+from utils.default_utils import setDefaultEncoding, initStreamingContext, ensureOffset
 import json
 
 count = 0
