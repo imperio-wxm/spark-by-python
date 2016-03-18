@@ -28,7 +28,7 @@ def reduceFun(rdds):
 
 if __name__ == "__main__":
     setDefaultEncoding()
-    ssc = initSparkContext("streaming_kafka_avg", "local[2]", 5)
+    ssc = initStreamingContext("streaming_kafka_avg", "local[2]", 5)
     ssc.checkpoint("hdfs://localhost:9000/checkpiont/streaming_cp_log")
 
     kvs = KafkaUtils.createDirectStream(ssc, ["realdata_receive"], {"metadata.broker.list": "192.168.108.222:9092"})
