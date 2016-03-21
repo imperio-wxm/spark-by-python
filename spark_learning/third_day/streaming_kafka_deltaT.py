@@ -12,12 +12,11 @@ import time
 # 转换json
 def toJson(rdd):
     line = json.loads(rdd[1].encode("UTF-8"))
-    change_time = int(time.mktime(
+    line["collect_time"] = int(time.mktime(
         time.strptime(
             datetime.datetime.now().strftime("%Y-%m-%d") + " " + line["collect_time"].encode("utf-8"),
             "%Y-%m-%d %H:%M:%S:%f"
         )))
-    line["collect_time"] = change_time
     return [line]
 
 # newValues新传进来的值
