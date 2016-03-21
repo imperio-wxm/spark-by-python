@@ -20,7 +20,6 @@ def toJson(rdd):
     line["collect_time"] = change_time
     return [line]
 
-
 # newValues新传进来的值
 # runningCount
 def updateFun(newValues, runningCount):
@@ -31,12 +30,12 @@ def updateFun(newValues, runningCount):
         newValues.sort(key=lambda k: (k.get("collect_time")), reverse=True)
         # 对新进来的值进行过滤
         newValue = newValues[0]
-        print newValue
+        print newValues
     print "=================================="
     if runningCount is not None:
         # 对旧值进行过滤
         oldValue = runningCount[0]
-        print oldValue
+        print runningCount
     print "++++++++++++++++++++++++++++++++++"
     return (newValue, oldValue)
 
@@ -45,7 +44,7 @@ def disconnection_patrol(lines):
     if lines[0] and lines[1] != "":
         print lines[0].get('collect_time')
         print lines[1].get('collect_time')
-        if lines[0].get('collect_time') - lines[1].get('collect_time') > 5:
+        if lines[0].get('collect_time') - lines[1].get('collect_time') > 10:
             print "time out"
     else:
         print "time out"
@@ -65,7 +64,7 @@ def foreachPartitionFun(rdd):
 if __name__ == "__main__":
     checkpoint_path = "hdfs://localhost:9000/checkpiont/streaming_cp_log"
     kafka_topic_list = ["realdata_receive"]
-    broker_list_dit = {"metadata.broker.list": "192.168.108.222:9092"}
+    broker_list_dit = {"metadata.broker.list": "101.200.194.191:9092"}
 
     setDefaultEncoding()
     ssc = initStreamingContext("streaming_kafka_deltaT", "local[2]", 5)
@@ -95,9 +94,8 @@ if __name__ == "__main__":
     """
 
     kvs = KafkaUtils.createDirectStream(ssc, kafka_topic_list, broker_list_dit)
-    events = kvs.flatMap(lambda lines: toJson(lines))
-    deltaT = events.map(lambda x: (x["oid"], x))
-    deltaT.updateStateByKey(updateFun).foreachRDD(foreachPartitionFun)
+    deltaT = kvs.flatMap(lambda lines: toJson(lines)).map(lambda x: (x["oid"], x)).\
+        updateStateByKey(updateFun).foreachRDD(foreachPartitionFun)
 
     ensureOffset(kvs=kvs)
 
