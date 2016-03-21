@@ -9,11 +9,9 @@ import json
 import datetime
 import time
 
-
+# 转换json
 def toJson(rdd):
     line = json.loads(rdd[1].encode("UTF-8"))
-    # print type(line["oid"].encode("utf-8"))
-
     change_time = int(time.mktime(
         time.strptime(
             datetime.datetime.now().strftime("%Y-%m-%d") + " " + line["collect_time"].encode("utf-8"),
@@ -42,7 +40,7 @@ def updateFun(newValues, runningCount):
     print "++++++++++++++++++++++++++++++++++"
     return (newValue, oldValue)
 
-
+# 断线时间计算
 def disconnection_patrol(lines):
     if lines[0] and lines[1] != "":
         print lines[0].get('collect_time')
@@ -52,7 +50,7 @@ def disconnection_patrol(lines):
     else:
         print "time out"
 
-
+# 对每个分区RDD操作
 def foreachPartitionFun(rdd):
     def partitionOfRecordsFun(rdd):
         print "xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
