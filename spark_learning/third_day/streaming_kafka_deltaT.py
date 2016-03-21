@@ -70,12 +70,12 @@ if __name__ == "__main__":
                     "%Y-%m-%d %H:%M:%S:%f"
                 )))])
         """
-
-        newValues.sort(key=lambda k: (k.get("collect_time")),reverse=True)
+        newValues.sort(key=lambda k: (k.get("collect_time")), reverse=True)
+        # 对新进来的值进行过滤
         print newValues[0]
         print "=================================="
         if runningCount is not None:
-
+            # 对旧值进行过滤
             oldValues = runningCount[0]
             print runningCount[0]
         print "++++++++++++++++++++++++++++++++++"
@@ -111,7 +111,6 @@ if __name__ == "__main__":
                     print deltaT_dict
                 """
                 # print deltaT_dict
-
         rdd.foreachPartition(partitionOfRecordsFun)
 
 
