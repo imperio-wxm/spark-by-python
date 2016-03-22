@@ -57,7 +57,7 @@ def disconnection_patrol(lines):
 
     def update_msg(message, collect_time):
         collect_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(collect_time))
-        change_dict = {'warring_state': 'event', 'warring_name': '断线', 'collect_time': collect_time}
+        change_dict = {'warning_state': 'event', 'warning_name': '断线', 'collect_time': collect_time}
         message.update(change_dict)
         kafka_produce(json.dumps(message))
 
@@ -91,10 +91,10 @@ def foreachPartitionFun(rdd):
 if __name__ == "__main__":
     checkpoint_path = "hdfs://localhost:9000/checkpiont/streaming_cp_log"
     kafka_topic_list = ["realdata_receive"]
-    broker_list_dit = {"metadata.broker.list": "192.168.108.222:9092"}
+    broker_list_dit = {"metadata.broker.list": "101.200.194.191:9092"}
 
     setDefaultEncoding()
-    ssc = initStreamingContext("streaming_kafka_deltaT", "local[2]", 5)
+    ssc = initStreamingContext("streaming_kafka_deltaT", "local[2]", 4)
     ssc.checkpoint(checkpoint_path)
 
     kvs = KafkaUtils.createDirectStream(ssc, kafka_topic_list, broker_list_dit)
