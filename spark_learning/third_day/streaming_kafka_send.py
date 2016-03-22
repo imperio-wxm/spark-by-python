@@ -41,35 +41,39 @@ def updateFun(newValues, runningCount):
     print "++++++++++++++++++++++++++++++++++"
     return (newValue, oldValue)
 
+
 # kafka produce
 def kafka_produce(message):
     client = KafkaClient(hosts="192.168.108.222:9092")
-    topic = client.topics['disconnection_receive']
+    topic = client.topics['disconnection_receive_topic']
 
     with topic.get_producer(delivery_reports=True) as producer:
         producer.produce(message)
         producer.stop()
 
+
 # 断线时间计算
 def disconnection_patrol(lines):
+
+    def update_msg(message, collect_time):
+        collect_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(collect_time))
+        change_dict = {'warring_state': 'event', 'warring_name': '断线', 'collect_time': collect_time}
+        message.update(change_dict)
+        kafka_produce(json.dumps(message))
+
     if lines[0] and lines[1] != "":
         print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-        print lines
         print lines[0].get('collect_time')
         print lines[1].get('collect_time')
-        if lines[0].get('collect_time') - lines[1].get('collect_time') > 5:
+        if lines[0].get('collect_time') - lines[1].get('collect_time') > 3:
             print "time out in"
-            kafka_produce("")
-
+            update_msg(lines[0], lines[0].get('collect_time'))
     else:
         print "time out out"
-        """
-        with topic.get_sync_producer() as producer:
-            print producer
-            producer.produce("time out")
-        producer.stop()
-        """
-        kafka_produce("")
+        if lines[0] == "" and lines[1] != "":
+            update_msg(lines[1], lines[1].get('collect_time'))
+        elif lines[1] == "" and lines[0] != "":
+            update_msg(lines[0], lines[0].get('collect_time'))
 
 
 # 对每个分区RDD操作
@@ -90,7 +94,7 @@ if __name__ == "__main__":
     broker_list_dit = {"metadata.broker.list": "192.168.108.222:9092"}
 
     setDefaultEncoding()
-    ssc = initStreamingContext("streaming_kafka_deltaT", "local[2]", 3)
+    ssc = initStreamingContext("streaming_kafka_deltaT", "local[2]", 5)
     ssc.checkpoint(checkpoint_path)
 
     kvs = KafkaUtils.createDirectStream(ssc, kafka_topic_list, broker_list_dit)
