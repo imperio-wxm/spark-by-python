@@ -10,8 +10,18 @@ import itertools
 import json
 import datetime
 import time
+from pykafka import KafkaClient
 import sys
 import redis
+import re
+
+# 字符串多次替换
+def multiple_replace(text,adict):  
+    rx = re.compile('|'.join(map(re.escape,adict)))  
+    def one_xlat(match):  
+        return adict[match.group(0)]  
+    return rx.sub(one_xlat,text)
+
 
 # 转换json
 def toJson(rdd):
@@ -142,6 +152,7 @@ def disconnection_patrol(lines):
 # 对每个分区RDD操作
 def foreachPartitionFun(rdd):
     def partitionOfRecordsFun(rdd):
+        replace_dict = {"u'":"\"","'":"\""}
 
         #topic = ConnectionPool.kafka_produce() 
 
@@ -151,9 +162,10 @@ def foreachPartitionFun(rdd):
             print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             def update_msg(message, collect_time):
                 collect_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(collect_time))
-                change_dict = {'warning_state': 'event', 'warning_name': '断线', 'collect_time': collect_time}
+                change_dict = {u'warning_state': u'event', u'warning_name': u'断线', u'collect_time': collect_time}
                 message.update(change_dict)
-
+                # 单引号转换
+                message = multiple_replace(json.dumps(message),replace_dict)
                 # redis
                 msgid = item[1][0].get('oid')
                 RedisCache().set_data(msgid, message)
@@ -179,9 +191,6 @@ def foreachPartitionFun(rdd):
 
 
 if __name__ == "__main__":
-    reload(sys)
-    sys.setdefaultencoding("utf-8")
-
     #checkpoint_path = "hdfs://spark-master:9000/checkpiont/streaming_cp_log"
     checkpoint_path = "tachyon-ft://spark-master:19998/checkpoint/streaming_log"
     kafka_topic_list = ["realdata_receive"]
