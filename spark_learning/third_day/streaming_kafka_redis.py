@@ -6,10 +6,10 @@ from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 import itertools
+#from default_utils import setDefaultEncoding, initStreamingContext, ensureOffset
 import json
 import datetime
 import time
-from pykafka import KafkaClient
 import sys
 import redis
 
@@ -65,17 +65,13 @@ class ConnectionPool:
             #producer.stop()
             #
 """
-
-# 单例模式的连接池
+            
 class RedisDBConfig:  
     HOST = 'spark-master'  
     PORT = 6379  
     DBID = 0 
 
-def operator_status(func):
-    """
-    状态反馈
-    """
+def operator_status(func):  
     def gen_status(*args, **kwargs):  
         error, result = None, None  
         try:  
@@ -87,30 +83,26 @@ def operator_status(func):
   
     return gen_status
 
-class RedisCache(object):
-    """
-    连接池封装
-    """
+class RedisCache(object):  
     def __init__(self):  
         if not hasattr(RedisCache, 'pool'):  
             RedisCache.create_pool()  
         self._connection = redis.Redis(connection_pool = RedisCache.pool) 
 
-    """
-    静态方法创建链接
-    """
     @staticmethod  
-    def create_pool():
+    def create_pool():  
         RedisCache.pool = redis.ConnectionPool(  
                 host = RedisDBConfig.HOST,  
                 port = RedisDBConfig.PORT,  
                 db   = RedisDBConfig.DBID)
-    """
-    封装基本set操作
-    """
+
     @operator_status  
     def set_data(self, key, value):  
         return self._connection.set(key, value)
+
+    @operator_status
+    def lpush_data(self, value):
+        return self._connection.lpush("realtime_data_queue",value)
 
 """
 # 断线时间计算
@@ -151,7 +143,7 @@ def disconnection_patrol(lines):
 def foreachPartitionFun(rdd):
     def partitionOfRecordsFun(rdd):
 
-        #topic = ConnectionPool.kafka_produce()
+        #topic = ConnectionPool.kafka_produce() 
 
         print "xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
         for item in itertools.chain(rdd):
@@ -165,6 +157,7 @@ def foreachPartitionFun(rdd):
                 # redis
                 msgid = item[1][0].get('oid')
                 RedisCache().set_data(msgid, message)
+                RedisCache().lpush_data(message)
                 print "redis His ok"
 
 
@@ -198,12 +191,16 @@ if __name__ == "__main__":
     sc = SparkContext(conf=conf)
     ssc = StreamingContext(sc, 5)
 
+    #setDefaultEncoding()
+    #ssc = initStreamingContext("streaming_kafka_deltaT", "local[2]", 7)
     ssc.checkpoint(checkpoint_path)
 
     kvs = KafkaUtils.createDirectStream(ssc, kafka_topic_list, broker_list_dit)
     deltaT = kvs.flatMap(lambda lines: toJson(lines)).map(lambda x: (x["oid"], x)). \
         updateStateByKey(updateFun).foreachRDD(foreachPartitionFun)
 
+    #ensureOffset(kvs=kvs)
+    
     offsetRanges = []
 
     def storeOffsetRange(rdd):
