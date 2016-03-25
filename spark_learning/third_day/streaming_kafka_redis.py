@@ -52,7 +52,6 @@ def kafka_produce(message):
     with topic.get_sync_producer() as producer:
         producer.produce(message)
         producer.stop()
-"""
 
 class ConnectionPool:
     @staticmethod
@@ -65,6 +64,7 @@ class ConnectionPool:
             #producer.produce(message)
             #producer.stop()
             #
+"""
 
 # 单例模式的连接池
 class RedisDBConfig:  
@@ -151,7 +151,7 @@ def disconnection_patrol(lines):
 def foreachPartitionFun(rdd):
     def partitionOfRecordsFun(rdd):
 
-        topic = ConnectionPool.kafka_produce() 
+        #topic = ConnectionPool.kafka_produce()
 
         print "xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
         for item in itertools.chain(rdd):
