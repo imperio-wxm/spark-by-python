@@ -10,7 +10,6 @@ import datetime
 import time
 from pykafka import KafkaClient
 
-
 # 转换json
 def toJson(rdd):
     line = json.loads(rdd[1].encode("UTF-8"))
@@ -49,7 +48,7 @@ def kafka_produce(message):
 
     with topic.get_producer(delivery_reports=True) as producer:
         producer.produce(message)
-        producer.stop()
+    producer.stop()
 
 
 # 断线时间计算
@@ -65,7 +64,7 @@ def disconnection_patrol(lines):
         print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
         print lines[0].get('collect_time')
         print lines[1].get('collect_time')
-        if lines[0].get('collect_time') - lines[1].get('collect_time') > 3:
+        if lines[0].get('collect_time') - lines[1].get('collect_time') > 5:
             print "time out in"
             update_msg(lines[0], lines[0].get('collect_time'))
     else:
@@ -94,7 +93,7 @@ if __name__ == "__main__":
     broker_list_dit = {"metadata.broker.list": "101.200.194.191:9092"}
 
     setDefaultEncoding()
-    ssc = initStreamingContext("streaming_kafka_deltaT", "local[2]", 4)
+    ssc = initStreamingContext("streaming_kafka_deltaT", "local[2]", 7)
     ssc.checkpoint(checkpoint_path)
 
     kvs = KafkaUtils.createDirectStream(ssc, kafka_topic_list, broker_list_dit)
