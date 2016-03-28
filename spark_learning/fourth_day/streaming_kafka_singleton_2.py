@@ -147,7 +147,7 @@ def foreachPartitionFun(rdd):
                 s1 = KafkaCache().produce_fun(message)
                 s2 = KafkaCache().produce_fun(message)
                 if s1 == s2:
-                    print "same"
+                    print "some"
                 print "kafka is ok"
 
             if item[1][0] and item[1][1] != "":
