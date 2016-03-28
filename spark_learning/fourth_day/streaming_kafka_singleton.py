@@ -13,7 +13,6 @@ import time
 from pykafka import KafkaClient
 import re
 
-
 # 字符串多次替换
 def multiple_replace(text, adict):
     rx = re.compile('|'.join(map(re.escape, adict)))
@@ -22,7 +21,6 @@ def multiple_replace(text, adict):
         return adict[match.group(0)]
 
     return rx.sub(one_xlat, text)
-
 
 # 转换json
 def toJson(rdd):
