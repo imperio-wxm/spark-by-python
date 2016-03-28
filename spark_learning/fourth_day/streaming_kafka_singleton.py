@@ -6,19 +6,22 @@ from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 import itertools
-#from default_utils import setDefaultEncoding, initStreamingContext, ensureOffset
+# from default_utils import setDefaultEncoding, initStreamingContext, ensureOffset
 import json
 import datetime
 import time
 from pykafka import KafkaClient
 import re
 
+
 # 字符串多次替换
-def multiple_replace(text,adict):  
-    rx = re.compile('|'.join(map(re.escape,adict)))  
-    def one_xlat(match):  
-        return adict[match.group(0)]  
-    return rx.sub(one_xlat,text)
+def multiple_replace(text, adict):
+    rx = re.compile('|'.join(map(re.escape, adict)))
+
+    def one_xlat(match):
+        return adict[match.group(0)]
+
+    return rx.sub(one_xlat, text)
 
 
 # 转换json
@@ -51,47 +54,27 @@ def updateFun(newValues, runningCount):
     print "++++++++++++++++++++++++++++++++++"
     return (newValue, oldValue)
 
-"""
-# kafka produce
-def kafka_produce(message):
-    client = KafkaClient(hosts="192.168.108.222:9092")
-    topic = client.topics['disconnection_receive_topic']
 
-    with topic.get_sync_producer() as producer:
-        producer.produce(message)
-        producer.stop()
-
-class ConnectionPool:
-    @staticmethod
-    def kafka_produce():
-        client = KafkaClient(hosts="192.168.108.222:9092")
-        topic = client.topics['disconnection_receive_topic']
-        return topic
-
-        #with topic.get_sync_producer() as producer:
-            #producer.produce(message)
-            #producer.stop()
-            #
-"""
-            
 class KafkaConfig:
     HOST = "192.168.108.222:9092"
     TOPIC = "disconnection_receive_topic"
 
-def operator_status(func):  
-    def gen_status(*args, **kwargs):  
-        error, result = None, None  
-        try:  
-            result = func(*args, **kwargs)  
-        except Exception as e:  
-            error = str(e)  
-  
-        return {'result': result, 'error':  error}  
-  
+
+def operator_status(func):
+    def gen_status(*args, **kwargs):
+        error, result = None, None
+        try:
+            result = func(*args, **kwargs)
+        except Exception as e:
+            error = str(e)
+
+        return {'result': result, 'error': error}
+
     return gen_status
 
+
 class KafkaCache(object):
-    def __init__(self):  
+    def __init__(self):
         if not hasattr(KafkaCache, '_produce'):
             self._topic = KafkaCache.create_conn()
         self._produce = self._topic.get_sync_producer()
@@ -102,9 +85,10 @@ class KafkaCache(object):
         topic = client.topics[KafkaConfig.TOPIC]
         return topic
 
-    @operator_status  
+    @operator_status
     def produce_fun(self, message):
         return self._produce.produce(message)
+
 
 """
 # 断线时间计算
@@ -141,23 +125,23 @@ def disconnection_patrol(lines):
             update_msg(item[1][0], item[1][0].get('collect_time'))
 """
 
+
 # 对每个分区RDD操作
 def foreachPartitionFun(rdd):
     def partitionOfRecordsFun(rdd):
-        replace_dict = {"u'":"\"","'":"\""}
-
-        #topic = ConnectionPool.kafka_produce() 
+        replace_dict = {"u'": "\"", "'": "\""}
 
         print "xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
         for item in itertools.chain(rdd):
             print item[0], item[1]
             print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+
             def update_msg(message, collect_time):
                 collect_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(collect_time))
                 change_dict = {u'warning_state': u'event', u'warning_name': u'断线', u'collect_time': collect_time}
                 message.update(change_dict)
                 # 单引号转换
-                message = multiple_replace(json.dumps(message),replace_dict)
+                message = multiple_replace(json.dumps(message), replace_dict)
 
                 KafkaCache().produce_fun(message)
                 print "kafka is ok"
@@ -180,34 +164,38 @@ def foreachPartitionFun(rdd):
 
 
 if __name__ == "__main__":
-    #checkpoint_path = "hdfs://spark-master:9000/checkpiont/streaming_cp_log"
+    # checkpoint_path = "hdfs://spark-master:9000/checkpiont/streaming_cp_log"
     checkpoint_path = "tachyon-ft://spark-master:19998/checkpoint/streaming_log"
     kafka_topic_list = ["realdata_receive"]
     broker_list_dit = {"metadata.broker.list": "101.200.194.191:9092"}
-    
+
     conf = SparkConf().setAppName("streaming_kafka_send")
     sc = SparkContext(conf=conf)
     ssc = StreamingContext(sc, 5)
 
-    #setDefaultEncoding()
-    #ssc = initStreamingContext("streaming_kafka_deltaT", "local[2]", 7)
+    # setDefaultEncoding()
+    # ssc = initStreamingContext("streaming_kafka_deltaT", "local[2]", 7)
     ssc.checkpoint(checkpoint_path)
 
     kvs = KafkaUtils.createDirectStream(ssc, kafka_topic_list, broker_list_dit)
     deltaT = kvs.flatMap(lambda lines: toJson(lines)).map(lambda x: (x["oid"], x)). \
         updateStateByKey(updateFun).foreachRDD(foreachPartitionFun)
 
-    #ensureOffset(kvs=kvs)
-    
+    # ensureOffset(kvs=kvs)
+
     offsetRanges = []
+
 
     def storeOffsetRange(rdd):
         global offsetRanges
         offsetRanges = rdd.offsetRanges()
         return rdd
+
+
     def printOffsetRange(rdd):
         for o in offsetRanges:
             print "%s %s %s %s" % (o.topic, o.partition, o.fromOffset, o.untilOffset)
+
 
     kvs.transform(storeOffsetRange).foreachRDD(printOffsetRange)
 
