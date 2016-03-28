@@ -72,15 +72,16 @@ def operator_status(func):
 
     return gen_status
 
-
+# 饿汉模式
 class KafkaCache(object):
     def __init__(self):
         if not hasattr(KafkaCache, '_produce'):
-            self._topic = KafkaCache.create_conn()
+            self._topic = KafkaCache._create_conn()
         self._produce = self._topic.get_sync_producer()
 
+    # 私有
     @staticmethod
-    def create_conn():
+    def _create_conn():
         client = KafkaClient(hosts=KafkaConfig.HOST)
         topic = client.topics[KafkaConfig.TOPIC]
         return topic
@@ -143,7 +144,10 @@ def foreachPartitionFun(rdd):
                 # 单引号转换
                 message = multiple_replace(json.dumps(message), replace_dict)
 
-                KafkaCache().produce_fun(message)
+                s1 = KafkaCache().produce_fun(message)
+                s2 = KafkaCache().produce_fun(message)
+                if s1 == s2:
+                    print "some"
                 print "kafka is ok"
 
             if item[1][0] and item[1][1] != "":
