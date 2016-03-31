@@ -68,7 +68,7 @@ def producer_message(message):
     topic = client.topics[KafkaConfig.TOPIC]
     producer = topic.get_sync_producer()
     producer.produce(message[0])
-    print message[0]
+    #print message[0]
     print "object ok"
 
 
