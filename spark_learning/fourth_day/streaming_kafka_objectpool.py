@@ -16,7 +16,6 @@ import Queue
 import types
 from contextlib import contextmanager
 
-
 # 字符串多次替换
 def multiple_replace(text, adict):
     rx = re.compile('|'.join(map(re.escape, adict)))
@@ -25,7 +24,6 @@ def multiple_replace(text, adict):
         return adict[match.group(0)]
 
     return rx.sub(one_xlat, text)
-
 
 # 转换json
 def toJson(rdd):
@@ -36,7 +34,6 @@ def toJson(rdd):
             "%Y-%m-%d %H:%M:%S:%f"
         )))
     return [line]
-
 
 # newValues新传进来的值
 # runningCount
@@ -61,7 +58,6 @@ def updateFun(newValues, runningCount):
 class KafkaConfig:
     HOST = "192.168.108.222:9092"
     TOPIC = "disconnection_receive_topic"
-
 
 def producer_message(message):
     client = KafkaClient(hosts=KafkaConfig.HOST)
@@ -107,7 +103,6 @@ class ObjectPool(object):
     def recover_obj(self, obj):
         self.queue.put(obj)
 
-
 # 不用构造含有__enter__, __exit__的类就可以使用with，当然你可以直接把代码放到函数去用
 @contextmanager
 def createKafkaProducerPool(pool):
@@ -118,7 +113,6 @@ def createKafkaProducerPool(pool):
         yield None
     finally:
         pool.recover_obj(obj)
-
 
 # 对每个分区RDD操作
 def foreachPartitionFun(rdd):
@@ -183,17 +177,14 @@ if __name__ == "__main__":
 
     offsetRanges = []
 
-
     def storeOffsetRange(rdd):
         global offsetRanges
         offsetRanges = rdd.offsetRanges()
         return rdd
 
-
     def printOffsetRange(rdd):
         for o in offsetRanges:
             print "%s %s %s %s" % (o.topic, o.partition, o.fromOffset, o.untilOffset)
-
 
     kvs.transform(storeOffsetRange).foreachRDD(printOffsetRange)
 
