@@ -62,6 +62,7 @@ class KafkaConfig:
     HOST = "192.168.108.222:9092"
     TOPIC = "disconnection_receive_topic"
 
+
 def producer_message(message):
     client = KafkaClient(hosts=KafkaConfig.HOST)
     topic = client.topics[KafkaConfig.TOPIC]
@@ -70,9 +71,9 @@ def producer_message(message):
     print message[0]
     print "object ok"
 
+
 # 对象池
 class ObjectPool(object):
-
     def __init__(self, fn_cls, *args, **kwargs):
         super(ObjectPool, self).__init__()
         self.fn_cls = fn_cls
@@ -80,7 +81,7 @@ class ObjectPool(object):
 
     def _myinit(self, *args, **kwargs):
         self.args = args
-        self.maxSize = int(kwargs.get("maxSize",1))
+        self.maxSize = int(kwargs.get("maxSize", 1))
         self.queue = Queue.Queue()
 
     def _get_obj(self):
@@ -97,14 +98,15 @@ class ObjectPool(object):
         # 这个print 没用，只是在你执行的时候告诉你目前的队列数，让你发现对象池的作用
         print self.queue._qsize()
         # 要是对象池大小还没有超过设置的最大数，可以继续放进去新对象
-        if self.queue.qsize()<self.maxSize and self.queue.empty():
+        if self.queue.qsize() < self.maxSize and self.queue.empty():
             self.queue.put(self._get_obj())
         # 都会返回一个对象给相关去用
         return self.queue.get()
 
     # 回收
-    def recover_obj(self,obj):
+    def recover_obj(self, obj):
         self.queue.put(obj)
+
 
 # 不用构造含有__enter__, __exit__的类就可以使用with，当然你可以直接把代码放到函数去用
 @contextmanager
@@ -116,8 +118,6 @@ def createKafkaProducerPool(pool):
         yield None
     finally:
         pool.recover_obj(obj)
-
-obj = ObjectPool(producer_message,maxSize=4)
 
 
 # 对每个分区RDD操作
@@ -137,7 +137,7 @@ def foreachPartitionFun(rdd):
                 # 单引号转换
                 message = multiple_replace(json.dumps(message), replace_dict)
 
-                obj = ObjectPool(producer_message,message,maxSize=4)
+                obj = ObjectPool(producer_message, message, maxSize=4)
 
                 with createKafkaProducerPool(obj) as producer_obj:
                     print producer_obj
