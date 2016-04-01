@@ -59,14 +59,12 @@ class KafkaConfig:
     HOST = "192.168.108.222:9092"
     TOPIC = "disconnection_receive_topic"
 
-def producer_message(message):
-    client = KafkaClient(hosts=KafkaConfig.HOST)
-    topic = client.topics[KafkaConfig.TOPIC]
-    producer = topic.get_sync_producer()
-    producer.produce(message[0])
-    #print message[0]
-    print "object ok"
-
+class producer_message(object):
+    def make_conn(self):
+        client = KafkaClient(hosts=KafkaConfig.HOST)
+        topic = client.topics[KafkaConfig.TOPIC]
+        producer = topic.get_sync_producer()
+        return producer
 
 # 对象池
 class ObjectPool(object):
@@ -131,11 +129,10 @@ def foreachPartitionFun(rdd):
                 # 单引号转换
                 message = multiple_replace(json.dumps(message), replace_dict)
 
-                obj = ObjectPool(producer_message, message, maxSize=4)
+                obj = ObjectPool(producer_message,maxSize=4)
 
                 with createKafkaProducerPool(obj) as producer_obj:
-                    print producer_obj
-
+                    producer_obj.make_conn().produce(message)
                 print "kafka is ok"
 
             if item[1][0] and item[1][1] != "":
