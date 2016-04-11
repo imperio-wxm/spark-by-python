@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # 切分
     parts = lines.map(lambda lines: lines.split(","))
 
-    # 隐射表间关系
+    # 隐射表间关系(定义表结构)
     book = parts.map(lambda book: Row(name=book[0], author=book[1], price=float(book[2]), publish=book[3]))
 
     # 转换成schema并注册
