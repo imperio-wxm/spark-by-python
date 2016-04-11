@@ -26,7 +26,7 @@ if __name__ == "__main__":
     schemaPeople.registerTempTable("book")
 
     # 定义sqk语句(查询prize在50、60之间的书)
-    book = sqlContext.sql("SELECT * FROM book WHERE price > 50.0 AND price < 60")
+    book = sqlContext.sql("SELECT * FROM book WHERE price > 50.0 AND price < 60 OR name like '%Spark%'")
 
     # 查询结果进行隐射
     bookMap = book.map(lambda books: (books.name, books.author, books.price, books.publish))
