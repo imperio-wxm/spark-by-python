@@ -1,0 +1,6 @@
+Java核心编程,Tom,25.53,机械工业出版社
+Python基础教程,Andy,50.36,人民教育出版社
+Spark编程指南,Bob,100.23,电子工业出版社
+Elasticsearch服务器开发,Rafal,56.4,人民邮电出版社
+Spark机器学习,Nick,75.6,人民邮电出版社
+Redis入门指南,Jack,66.3,电子工业出版社
