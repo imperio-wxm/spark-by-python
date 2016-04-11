@@ -1,7 +1,8 @@
-# Spark-By-Python
-"learn spark by python"
+# Spark-By-Python 目录结构
 
-## 目录结构
+***
+
+## streaming
 
 ### first_day
 
@@ -18,3 +19,9 @@
 ### fourth_day
 
 > spark streaming结合kafka、redis
+
+## sql
+
+### first_day
+
+> spark sql 基本应用
