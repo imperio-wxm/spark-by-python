@@ -1,7 +1,5 @@
 # Spark-By-Python 目录结构
 
-***
-
 ## streaming
 
 ### first_day
@@ -19,6 +17,8 @@
 ### fourth_day
 
 > spark streaming结合kafka、redis
+
+***
 
 ## sql
 
