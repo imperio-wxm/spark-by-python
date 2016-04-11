@@ -17,10 +17,15 @@ if __name__ == "__main__":
     df = sqlContext.read.json(file_path)
 
     # Displays the content of the DataFrame to stdout
+    # 显示全表
     df.show()
+    # 显示姓名
     df.select("name").show()
+    # 显示姓名、年龄+1
     df.select(df['name'], df['age'] + 1).show()
+    # 显示年龄>21
     df.filter(df['age'] > 21).show()
+    # 按age分组计数
     df.groupBy("age").count().show()
 
     sc.stop()
