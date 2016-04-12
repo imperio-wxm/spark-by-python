@@ -27,10 +27,10 @@ if __name__ == "__main__":
     schemaPeople = sqlContext.createDataFrame(book)
     schemaPeople.registerTempTable("txt_book")
 
-    # json_book = sqlContext.sql("select * from json_book AS jbook LEFT JOIN txt_book AS tbook ON tbook.name=jbook.name")
-    json_book = sqlContext.sql("select * from json_book AS jbook , txt_book AS tbook where jbook.name=tbook.name")
+    # sql_book = sqlContext.sql("select * from json_book AS jbook LEFT JOIN txt_book AS tbook ON tbook.name=jbook.name")
+    sql_book = sqlContext.sql("select * from json_book AS jbook , txt_book AS tbook where jbook.name=tbook.name")
 
-    bookMap = json_book.map(lambda books: (books.name, books.author, books.price, books.publish, books.place))
+    bookMap = sql_book.map(lambda books: (books.name, books.author, books.price, books.publish, books.place))
 
     for book in bookMap.collect():
         print book[0], book[1], book[2], book[3], book[4]
