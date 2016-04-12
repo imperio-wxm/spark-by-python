@@ -35,3 +35,5 @@ if __name__ == "__main__":
 
     for book in bookMap.collect():
         print book[0], book[1], book[2], book[3], book[4]
+
+    sc.stop()
