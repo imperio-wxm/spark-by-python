@@ -33,3 +33,5 @@ if __name__ == "__main__":
 
     for book in bookMap.collect():
         print "|Name: " + book[0], "|Author: " + book[1], "|Price: " + str(book[2]), "|Publish: " + book[3] + "|"
+
+    sc.stop()
