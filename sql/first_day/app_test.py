@@ -16,6 +16,12 @@ if __name__ == "__main__":
 
     df = sqlContext.read.json(file_path)
 
+    """
+    In Python it’s possible to access a DataFrame’s columns either by attribute (df.age) or by indexing (df['age']).
+    While the former is convenient for interactive data exploration, users are highly encouraged to use the latter form,
+    which is future proof and won’t break with column names that are also attributes on the DataFrame class.
+    """
+
     # Displays the content of the DataFrame to stdout
     # 显示全表
     df.show()
