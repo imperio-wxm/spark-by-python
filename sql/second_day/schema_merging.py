@@ -8,7 +8,6 @@ import os
 
 if __name__ == "__main__":
     file_path = os.path.abspath("../doc")
-    print
 
     conf = SparkConf().setMaster("local[2]").setAppName("schema_merging")
     sc = SparkContext(conf=conf)
