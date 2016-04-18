@@ -17,14 +17,16 @@ if __name__ == "__main__":
 
     # 创建DataFrame
     df1 = sqlContext.createDataFrame(sc.parallelize(range(1, 6)).map(lambda i: Row(single=i, double=i * 2)))
-    df1.write.parquet(file_path + "/key=1")
+    df1.write.parquet(file_path + "/result/key=1")
 
-    df2 = sqlContext.createDataFrame(sc.parallelize(range(6, 11)).map(lambda i: Row(single=i, double=i * 3)))
-    df2.write.parquet(file_path + "/key=2")
+    df2 = sqlContext.createDataFrame(sc.parallelize(range(6, 11)).map(lambda i: Row(single=i, triple=i * 3)))
+    df2.write.parquet(file_path + "/result/key=2")
 
-    df3 = sqlContext.read.option("mergeSchema", "true").parquet(file_path)
+    df3 = sqlContext.read.option("mergeSchema", "true").parquet(file_path + "/result")
     df3.printSchema()
 
-    df3.collect()
+    # print df3.collect()
+    for row in df3.collect():
+        print "single=" + str(row[0]), "triple=" + str(row[1]), "double=" + str(row[2]), "key=" + str(row[3])
 
     sc.stop()
