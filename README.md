@@ -25,3 +25,7 @@
 - first_day
 
 > spark sql 基本应用
+
+- second_day
+
+> spark sql 基本操作
