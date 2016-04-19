@@ -4,6 +4,11 @@ __author__ = 'wxmimperio'
 
 from pyspark import SparkContext, SparkConf
 from pyspark import SQLContext
+import itertools
+
+def print_fun(collect):
+    for item in itertools.chain(collect):
+        print "|Name: " + item[0], "|Value: " + str(item[1]), "|Attribute: " + item[2]
 
 if __name__ == "__main__":
     conf = SparkConf().setAppName("json_ops").setMaster("local[3]")
@@ -24,10 +29,6 @@ if __name__ == "__main__":
     assets.show()
 
     # 查询结果进行隐射
-    assetMap = assets.map(lambda asset: (asset.name, asset.value, asset.attribute))
-
-    for asset in assetMap.collect():
-        print "|Name: " + asset[0], "|Value: " + str(asset[1]), "|Attribute: " + asset[2]
+    assetMap = assets.map(lambda asset: (asset.name, asset.value, asset.attribute)).foreachPartition(print_fun)
 
     sc.stop()
-
