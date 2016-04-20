@@ -82,6 +82,5 @@ if __name__ == "__main__":
         print "|Name: " + item[0], "|Value: " + str(item[1])
         print type(item[0].encode("utf-8")), type(item[1])
         RedisCache().zadd("save_his", item[1], item[0].encode("utf-8"))
-    RedisCache().zadd("test", 1 ,"dsfasd")
 
     sc.stop()
