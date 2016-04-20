@@ -28,4 +28,4 @@
 
 - second_day
 
-> spark sql 基本操作
+> spark sql 基本操作(json、schema合并、redis)
