@@ -7,10 +7,12 @@ from pyspark import SQLContext
 import redis
 import itertools
 
+
 class RedisDBConfig:
     HOST = '192.168.108.222'
     PORT = 6379
     DBID = 0
+
 
 def operator_status(func):
     def gen_status(*args, **kwargs):
@@ -42,19 +44,23 @@ class RedisCache(object):
     def set_data(self, key, value):
         return self._connection.set(key, value)
 
-
     @operator_status
     def zrange_by_score(self, key, start, end):
         return self._connection.zrangebyscore(key, start, end)
 
     @operator_status
-    def z_add(self, key, size, value):
-        return self._connection.zadd(key, size, value)
+    def z_add(self, key, value, size):
+        """
+        value不能出现""，双引号
+        """
+        return self._connection.zadd(key, value, size)
 
-def print_fun(collect):
-    for item in itertools.chain(collect):
+
+def print_fun(collect_asset):
+    for item in collect_asset:
         print "|Name: " + item[0], "|Value: " + str(item[1])
-        RedisCache().zadd("save_his", item[1], item[0])
+        RedisCache().z_add("save_his", item[0].encode("utf-8"), item[1])
+
 
 if __name__ == "__main__":
     conf = SparkConf().setMaster("sql_redis").setMaster("local")
@@ -63,7 +69,6 @@ if __name__ == "__main__":
 
     his_data = RedisCache().zrange_by_score("his_data", 123, 456)
     print his_data['result']
-    RedisCache().z_add("testd", 123456 ,"dsfasd")
 
     hisRDD = sc.parallelize(his_data['result'])
 
@@ -75,12 +80,10 @@ if __name__ == "__main__":
     assets.show()
 
     # 查询结果进行隐射
-    #assetMap = assets.map(lambda asset: (asset.name, asset.value)).foreachPartition(print_fun)
+    # assetMap = assets.map(lambda asset: (asset.name, asset.value)).foreachPartition(print_fun)
     assetMap = assets.map(lambda asset: (asset.name, asset.value))
+    collect_asset = assetMap.collect()
 
-    for item in assetMap.collect():
-        print "|Name: " + item[0], "|Value: " + str(item[1])
-        print type(item[0].encode("utf-8")), type(item[1])
-        RedisCache().z_add("save_his", item[1], item[0].encode("utf-8"))
+    print_fun(collect_asset)
 
     sc.stop()
