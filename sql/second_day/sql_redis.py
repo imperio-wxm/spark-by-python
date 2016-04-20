@@ -48,7 +48,7 @@ class RedisCache(object):
         return self._connection.zrangebyscore(key, start, end)
 
     @operator_status
-    def zadd(self, key, size, value):
+    def z_add(self, key, size, value):
         return self._connection.zadd(key, size, value)
 
 def print_fun(collect):
@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     his_data = RedisCache().zrange_by_score("his_data", 123, 456)
     print his_data['result']
-    RedisCache().zadd("test", 123456 ,"dsfasd")
+    RedisCache().z_add("testd", 123456 ,"dsfasd")
 
     hisRDD = sc.parallelize(his_data['result'])
 
@@ -81,6 +81,6 @@ if __name__ == "__main__":
     for item in assetMap.collect():
         print "|Name: " + item[0], "|Value: " + str(item[1])
         print type(item[0].encode("utf-8")), type(item[1])
-        RedisCache().zadd("save_his", item[1], item[0].encode("utf-8"))
+        RedisCache().z_add("save_his", item[1], item[0].encode("utf-8"))
 
     sc.stop()
