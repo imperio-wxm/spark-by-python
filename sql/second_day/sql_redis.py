@@ -58,32 +58,36 @@ class RedisCache(object):
 
 def print_fun(collect_asset):
     for item in collect_asset:
-        print "|Name: " + item[0], "|Value: " + str(item[1])
-        RedisCache().z_add("save_his", item[0].encode("utf-8"), item[1])
+        pass
+        #print "|Name: " + item[0], "|Value: " + str(item[1])
+        #RedisCache().z_add("save_his", item[0].encode("utf-8"), item[1])
 
 
 if __name__ == "__main__":
-    conf = SparkConf().setMaster("sql_redis").setMaster("local")
+    conf = SparkConf().setMaster("sql_redis").setMaster("local[2]")
     sc = SparkContext(conf=conf)
     sqlContext = SQLContext(sc)
 
-    his_data = RedisCache().zrange_by_score("his_data", 123, 456)
-    print his_data['result']
+    his_data = RedisCache().zrange_by_score("his_data_zadd", 1461217070, 1461217140)
+    #print his_data['result']
 
     hisRDD = sc.parallelize(his_data['result'])
 
     his = sqlContext.jsonRDD(hisRDD)
-    his.registerTempTable("his_data")
+    his.registerTempTable("his_data_zadd")
 
-    assets = sqlContext.sql("SELECT * FROM his_data")
+    assets = sqlContext.sql("SELECT his.name, his.oid FROM his_data_zadd as his WHERE his.value > 200 AND oid < 3000000")
 
     assets.show()
 
     # 查询结果进行隐射
     # assetMap = assets.map(lambda asset: (asset.name, asset.value)).foreachPartition(print_fun)
-    assetMap = assets.map(lambda asset: (asset.name, asset.value))
+    #assetMap = assets.map(lambda asset: (asset.name, asset.value))
+    #assetMap = assets.map(lambda asset: (asset.max_value))
+    assetMap = assets.map(lambda asset: (asset.name, asset.oid))
     collect_asset = assetMap.collect()
 
     print_fun(collect_asset)
 
     sc.stop()
+
