@@ -5,6 +5,8 @@ __author__ = 'wxmimperio'
 from pyspark import SparkContext, SparkConf
 from pyspark import SQLContext
 import redis
+import time
+from datetime import datetime,timedelta
 import itertools
 
 
@@ -68,26 +70,37 @@ if __name__ == "__main__":
     sc = SparkContext(conf=conf)
     sqlContext = SQLContext(sc)
 
-    his_data = RedisCache().zrange_by_score("his_data_zadd", 1461217070, 1461217140)
+    # 查询从当前时间开始前10s的数据
+    now_datetime = datetime.now()
+    end_time = int(time.mktime(now_datetime.timetuple()))
+    start_time = int(time.mktime((now_datetime - timedelta(seconds=10)).timetuple()))
+    print start_time
+    print end_time
+
+    his_data = RedisCache().zrange_by_score("his_data_zadd", start_time, end_time)
     #print his_data['result']
 
-    hisRDD = sc.parallelize(his_data['result'])
+    if his_data['result']:
+        hisRDD = sc.parallelize(his_data['result'])
+        his = sqlContext.jsonRDD(hisRDD)
+        his.registerTempTable("his_data_zadd")
 
-    his = sqlContext.jsonRDD(hisRDD)
-    his.registerTempTable("his_data_zadd")
+        #assets = sqlContext.sql("SELECT his.name, his.oid FROM his_data_zadd as his WHERE his.value > 200 AND his.oid < 3000000")
+        #sql_str = "SELECT his.name, his.oid FROM (SELECT MAX(temp_t.value), temp_t.name, temp_t.oid FROM his_data_zadd AS temp_t) his"
+        sql_str = "SELECT his.name, his.oid, his.value FROM his_data_zadd AS his ORDER BY his.value DESC LIMIT 10"
+        #sql_str = 'SELECT his.name, his.oid FROM his_data_zadd AS his WHERE his.value=(SELECT MAX(temp_t.value) FROM his_data_zadd AS temp_t)'
+        assets = sqlContext.sql(sql_str)
 
-    assets = sqlContext.sql("SELECT his.name, his.oid FROM his_data_zadd as his WHERE his.value > 200 AND oid < 3000000")
+        assets.show()
 
-    assets.show()
+        # 查询结果进行隐射
+        # assetMap = assets.map(lambda asset: (asset.name, asset.value)).foreachPartition(print_fun)
+        #assetMap = assets.map(lambda asset: (asset.name, asset.value))
+        #assetMap = assets.map(lambda asset: (asset.max_value))
+        assetMap = assets.map(lambda asset: (asset.name, asset.oid, asset.value))
+        collect_asset = assetMap.collect()
 
-    # 查询结果进行隐射
-    # assetMap = assets.map(lambda asset: (asset.name, asset.value)).foreachPartition(print_fun)
-    #assetMap = assets.map(lambda asset: (asset.name, asset.value))
-    #assetMap = assets.map(lambda asset: (asset.max_value))
-    assetMap = assets.map(lambda asset: (asset.name, asset.oid))
-    collect_asset = assetMap.collect()
-
-    print_fun(collect_asset)
+        print_fun(collect_asset)
 
     sc.stop()
 
