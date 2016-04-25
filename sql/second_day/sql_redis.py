@@ -87,8 +87,12 @@ if __name__ == "__main__":
 
         #assets = sqlContext.sql("SELECT his.name, his.oid FROM his_data_zadd as his WHERE his.value > 200 AND his.oid < 3000000")
         #sql_str = "SELECT his.name, his.oid FROM (SELECT MAX(temp_t.value), temp_t.name, temp_t.oid FROM his_data_zadd AS temp_t) his"
-        sql_str = "SELECT his.name, his.oid, his.value FROM his_data_zadd AS his ORDER BY his.value DESC LIMIT 10"
+        #sql_str = "SELECT his.name, his.oid, his.value FROM his_data_zadd AS his ORDER BY his.value DESC LIMIT 10"
         #sql_str = 'SELECT his.name, his.oid FROM his_data_zadd AS his WHERE his.value=(SELECT MAX(temp_t.value) FROM his_data_zadd AS temp_t)'
+        """
+        Spark 1.5 does not support subquery.
+        """
+        sql_str = 'SELECT MAX(his_t.value) as max_value FROM his_data_zadd AS his_t GROUP BY his_t.name,his_t.oid,his_t.collect_time,his_t.value'
         assets = sqlContext.sql(sql_str)
 
         assets.show()
