@@ -76,11 +76,16 @@ if __name__ == "__main__":
         value = random.uniform(0, 500)
 
         message = '{"name":"asset' + str(count) +'","oid":"' + str(oid) + '","value":' + \
-                  str(value) + ',"collect_time":"' + now_datetime.strftime("%H:%M:%S:%f") + '"}'
+              str(value) + ',"collect_time":"' + now_datetime.strftime("%H:%M:%S:%f") + '"}'
         count = count + 1
         RedisCache()._connection.zadd("his_data_zadd", message, timeStamp)
 
         print message
+
+        if count > 5000000:
+            flag = False
+
         #if count == 100001:
             #flag = False
-        time.sleep(1)
+        #time.sleep(1)
+
