@@ -1,4 +1,4 @@
-{"name": "Java核心编程", "place": "上海"}
-{"name": "Spark编程指南", "place": "北京"}
-{"name": "Redis入门指南", "place": "南京"}
-{"name": "Python基础教程", "place": "广州"}
+{"name": "Java核心编程", "place": "上海", "price":45.96, "evaluation":1}
+{"name": "Spark编程指南", "place": "北京", "price":30.26, "evaluation":1}
+{"name": "Redis入门指南", "place": "南京", "price":10.23,"evaluation":2}
+{"name": "Python基础教程", "place": "广州", "price":100.256,"evaluation":4}
