@@ -53,6 +53,8 @@ if __name__ == "__main__":
         sql_str = 'SELECT * FROM his_data_zadd his_t ORDER BY his_t.value DESC LIMIT 1'
         #sql_str = 'SELECT * FROM (SELECT his_t.value,his_t.name FROM his_data_zadd his_t WHERE his_t.value > 100)'
         assets = sqlContext.sql(sql_str)
+
+        # 结果存储parquet格式
         #assets.saveAsParquetFile("hdfs://localhost:9000/user/parquet_1")
 
         assets.show()
