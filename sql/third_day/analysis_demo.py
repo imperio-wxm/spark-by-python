@@ -4,7 +4,7 @@ __author__ = 'wxmimperio'
 
 from pyspark import SparkContext, SparkConf
 from pyspark import SQLContext, Row
-from sql.third_day.algorithm.utils_demo import result_email, result_username_len, result_surname
+from sql.third_day.algorithm.utils_demo import *
 import os
 
 
@@ -54,6 +54,7 @@ if __name__ == "__main__":
     """
     :邮箱分析与统计
     """
+    """
     email_str = "SELECT analysis_email(email) AS email FROM information"
     emailSQL = sqlContext.sql(email_str)
     # 求总数
@@ -62,9 +63,12 @@ if __name__ == "__main__":
     emailCollect = emailSQL.groupBy("email").count().collect()
     # email分析结果
     result_email(emailCollect, count)
+    """
+
 
     """
-    :用户名分析与统计
+    :用户名与姓名分析与统计
+    """
     """
     # 用户名长度统计
     username_len_str = "SELECT analysis_username(username) AS username_len FROM information"
@@ -77,6 +81,24 @@ if __name__ == "__main__":
     surnameSQL = sqlContext.sql(surname_sql)
     surnameCollect = sorted(surnameSQL.groupBy("surname").count().collect(), key=(lambda x: x[1]), reverse=True)
     result_surname(surnameCollect, count)
+
+    # 姓名长度统计
+    realname_sql = "SELECT analysis_username(realname) AS realname_len FROM information"
+    realnameSQL = sqlContext.sql(realname_sql)
+    realnameLenCollect = realnameSQL.groupBy("realname_len").count().collect()
+    result_realname(realnameLenCollect, count)
+    """
+
+    """
+    :身份证分析与统计
+    """
+    # 用户名长度统计
+    idcard_len_str = "SELECT analysis_username(idcard) AS idcard_len FROM information"
+    idcardSQL = sqlContext.sql(idcard_len_str)
+    temp_count = idcardSQL.groupBy("idcard_len").count()
+    idcardLenCollect = temp_count.filter(temp_count["idcard_len"] == '18').collect()
+    print idcardLenCollect
+    #result_username_len(idcardLenCollect, count)
 
     schemaInfo.show()
 
