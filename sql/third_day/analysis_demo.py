@@ -4,14 +4,30 @@ __author__ = 'wxmimperio'
 
 from pyspark import SparkContext, SparkConf
 from pyspark import SQLContext, Row
-from sql.third_day.algorithm.utils_demo import result_email
+from sql.third_day.algorithm.utils_demo import result_email, result_username_len, result_surname
 import os
+
 
 def analysis_email(email):
     """
     邮箱分割
     """
     return email.split("@")[1].split(".")[0]
+
+
+def analysis_username(username):
+    """
+    用户名长度计算
+    """
+    return len(username)
+
+
+def analysis_surname(realname):
+    """
+    用户名姓氏分割
+    """
+    return realname[0]
+
 
 if __name__ == "__main__":
     conf = SparkConf().setAppName("analysis_demo")
@@ -20,13 +36,15 @@ if __name__ == "__main__":
 
     # UDF自定义函数注册
     sqlContext.registerFunction("analysis_email", analysis_email)
+    sqlContext.registerFunction("analysis_username", analysis_username)
+    sqlContext.registerFunction("analysis_surname", analysis_surname)
 
     file_path = os.path.abspath("../doc/analysis.txt")
     lines = sc.textFile(file_path)
 
-    info = lines.map(lambda lines: lines.split("----")).\
+    info = lines.map(lambda lines: lines.split("----")). \
         map(lambda info: Row(email=info[0], username=info[1], realname=info[2],
-                                      idcard=info[3], password=info[4], phone=info[5]))
+                             idcard=info[3], password=info[4], phone=info[5]))
 
     schemaInfo = sqlContext.createDataFrame(info)
     schemaInfo.registerTempTable("information")
@@ -44,5 +62,22 @@ if __name__ == "__main__":
     emailCollect = emailSQL.groupBy("email").count().collect()
     # email分析结果
     result_email(emailCollect, count)
+
+    """
+    :用户名分析与统计
+    """
+    # 用户名长度统计
+    username_len_str = "SELECT analysis_username(username) AS username_len FROM information"
+    usernameSQL = sqlContext.sql(username_len_str)
+    usernameLenCollect = usernameSQL.groupBy("username_len").count().collect()
+    result_username_len(usernameLenCollect, count)
+
+    # 姓氏统计
+    surname_sql = "SELECT analysis_surname(realname) AS surname FROM information"
+    surnameSQL = sqlContext.sql(surname_sql)
+    surnameCollect = sorted(surnameSQL.groupBy("surname").count().collect(), key=(lambda x: x[1]), reverse=True)
+    result_surname(surnameCollect, count)
+
+    schemaInfo.show()
 
     sc.stop()
