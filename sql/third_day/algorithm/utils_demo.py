@@ -69,3 +69,15 @@ def result_privince(provinceCollect, count):
             print provinceList.get(item[0].decode("utf-8")), item[1], str(
                 "%.2f" % ((float(item[1]) / count) * 100)) + "%"
 
+
+def result_output(collect):
+    initCollect = collect
+    man = woman = sum = 0
+
+    for item in initCollect[0:-1]:
+        if int(item[0]) % 2 == 0:
+            woman += item[1]
+        else:
+            man += item[1]
+    sum = man + woman
+    print "男：" + str(man), str("%.2f" % (man / float(sum) * 100)) + "%", "女：" + str(woman), str("%.2f" % (woman / float(sum) * 100)) + "%"
