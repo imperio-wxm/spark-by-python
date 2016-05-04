@@ -5,6 +5,7 @@ __author__ = 'wxmimperio'
 from pyspark import SparkContext, SparkConf
 from pyspark import SQLContext, Row
 from sql.third_day.algorithm.utils_demo import *
+from datetime import datetime
 import os
 
 
@@ -82,17 +83,28 @@ if __name__ == "__main__":
     print idcardLenCollect
     #result_username_len(idcardLenCollect, count)
     """
+    now_datetime = datetime.now()
+    now_year = now_datetime.year
 
     idcard_str = "SELECT SUBSTRING(idcard,0,2) AS province_code,SUBSTRING(idcard,7,8) AS birthday, " \
-                 "CAST(SUBSTRING(idcard,7,4) AS INT) AS birthday,SUBSTRING(idcard,11,2) AS birth_month," \
-                 "SUBSTRING(idcard,13,2) AS birth_day,SUBSTRING(idcard,17,1) AS gender, " \
+                 "CAST(SUBSTRING(idcard,7,4) AS INT) AS birth_year,SUBSTRING(idcard,11,2) AS birth_month," \
+                 "SUBSTRING(idcard,13,2) AS birth_day,SUBSTRING(idcard,17,1) AS gender," \
+                 + str(now_year) + "-SUBSTRING(idcard,7,4) AS age " \
                  "FROM information WHERE LENGTH(idcard)='18'"
+
     idcardSQL = sqlContext.sql(idcard_str)
+
     provinceCollect = idcardSQL.groupBy("province_code").count().collect()
     result_privince(provinceCollect, count)
 
-    birthdayCollect = idcardSQL.groupBy("birthday").count().collect()
+    birthdayCollect = idcardSQL.groupBy("birth_year").count().collect()
     print birthdayCollect
+
+    ageCollect = idcardSQL.groupBy("age").count().collect()
+    print ageCollect
+
+    genderCollect = idcardSQL.groupBy("gender").count().collect()
+
 
     idcardSQL.show()
 
