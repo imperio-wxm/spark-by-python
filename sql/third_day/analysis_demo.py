@@ -94,6 +94,7 @@ if __name__ == "__main__":
 
     idcardSQL = sqlContext.sql(idcard_str)
 
+    # 省份分布
     provinceCollect = idcardSQL.groupBy("province_code").count().collect()
     result_privince(provinceCollect, count)
 
@@ -103,8 +104,9 @@ if __name__ == "__main__":
     ageCollect = idcardSQL.groupBy("age").count().collect()
     print ageCollect
 
+    # 性别分布
     genderCollect = idcardSQL.groupBy("gender").count().collect()
-
+    result_output(genderCollect)
 
     idcardSQL.show()
 
