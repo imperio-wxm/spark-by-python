@@ -4,7 +4,7 @@ __author__ = 'wxmimperio'
 
 from pyspark import SparkContext, SparkConf
 from pyspark import SQLContext, Row
-from sql.third_day.algorithm.utils_demo import *
+from sql.third_day.utils.utils_demo import *
 from datetime import datetime
 import os
 
