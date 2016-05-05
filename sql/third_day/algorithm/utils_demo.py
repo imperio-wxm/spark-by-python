@@ -49,8 +49,8 @@ def result_realname(realnameLenCollect, count):
     realnameList = realnameLenCollect
     other = 0
     for item in realnameList[0:-1]:
-        if item[0].encode("utf-8") in lenList:
-            print item[0].encode("utf-8"), item[1], str("%.2f" % ((float(item[1]) / count) * 100)) + "%"
+        if str(item[0]) in lenList:
+            print str(item[0]), item[1], str("%.2f" % ((float(item[1]) / count) * 100)) + "%"
             realnameList.remove((item[0], item[1]))
     for item in realnameList:
         other += item[1]
@@ -70,7 +70,7 @@ def result_privince(provinceCollect, count):
                 "%.2f" % ((float(item[1]) / count) * 100)) + "%"
 
 
-def result_output(collect):
+def result_gender(collect):
     initCollect = collect
     man = woman = sum = 0
 
@@ -80,4 +80,29 @@ def result_output(collect):
         else:
             man += item[1]
     sum = man + woman
-    print "男：" + str(man), str("%.2f" % (man / float(sum) * 100)) + "%", "女：" + str(woman), str("%.2f" % (woman / float(sum) * 100)) + "%"
+    print "男：" + str(man), str("%.2f" % (man / float(sum) * 100)) + "%", "女：" + str(woman), str(
+        "%.2f" % (woman / float(sum) * 100)) + "%"
+
+
+def result_phoneOpts(collect):
+    initCollect = collect
+    china_mobile = ["134", "135", "136", "137", "138", "139", "150", "151", "152",
+                    "157", "158", "159", "147", "182", "183", "184", "187", "188"]
+    china_unicom = ["130", "131", "132", "145", "155", "156", "185", "186"]
+    china_telecom = ["133", "153", "180", "181", "189"]
+    mobile = unicom = telecom = other = 0
+
+    for item in initCollect[0:-1]:
+        if item[0] in china_mobile:
+            mobile += item[1]
+        elif item[0] in china_unicom:
+            unicom += item[1]
+        elif item[0] in china_telecom:
+            telecom += item[1]
+        else:
+            other += item[1]
+    sum = mobile + unicom + telecom + other
+    print "中国移动:" + str(mobile), str("%.2f" % (mobile / float(sum) * 100)) + "%", \
+        "中国联通:" + str(unicom), str("%.2f" % (unicom / float(sum) * 100)) + "%", \
+        "中国电信:" + str(telecom), str("%.2f" % (telecom / float(sum) * 100)) + "%", \
+        "其他:" + str(other), str("%.2f" % (other / float(sum) * 100)) + "%"
