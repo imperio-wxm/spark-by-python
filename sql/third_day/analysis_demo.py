@@ -15,7 +15,6 @@ def analysis_email(email):
     """
     return email.split("@")[1].split(".")[0]
 
-
 if __name__ == "__main__":
     conf = SparkConf().setAppName("analysis_demo").setMaster("local[2]")
     sc = SparkContext(conf=conf)
@@ -34,7 +33,8 @@ if __name__ == "__main__":
     schemaInfo = sqlContext.createDataFrame(info)
     schemaInfo.registerTempTable("information")
     # cache表
-    sqlContext.cacheTable("information")
+    #sqlContext.cacheTable("information")
+    #sqlContext.uncacheTable("information")
 
     """
     :邮箱分析与统计
@@ -50,7 +50,6 @@ if __name__ == "__main__":
 
     """
     :用户名与姓名分析与统计
-    """
     """
     # 用户名长度统计
     username_len_str = "SELECT LENGTH(username) AS username_len FROM information"
@@ -69,11 +68,9 @@ if __name__ == "__main__":
     realnameSQL = sqlContext.sql(realname_sql)
     realnameLenCollect = realnameSQL.groupBy("realname_len").count().collect()
     result_realname(realnameLenCollect, count)
-    """
 
     """
     :身份证分析与统计
-    """
     """
     # 身份证长度统计
     idcard_len_str = "SELECT LENGTH(idcard) AS idcard_len FROM information"
@@ -82,14 +79,14 @@ if __name__ == "__main__":
     idcardLenCollect = temp_count.filter(temp_count["idcard_len"] == '18').collect()
     print idcardLenCollect
     #result_username_len(idcardLenCollect, count)
-    """
+
     now_datetime = datetime.now()
     now_year = now_datetime.year
 
     idcard_str = "SELECT SUBSTRING(idcard,0,2) AS province_code,SUBSTRING(idcard,7,8) AS birthday, " \
                  "CAST(SUBSTRING(idcard,7,4) AS INT) AS birth_year,SUBSTRING(idcard,11,2) AS birth_month," \
                  "SUBSTRING(idcard,13,2) AS birth_day,SUBSTRING(idcard,17,1) AS gender," \
-                 + str(now_year) + "-SUBSTRING(idcard,7,4) AS age " \
+                 + str(now_year) + "-SUBSTRING(idcard,7,4) AS age, SUBSTRING(phone,0,3) AS phone_opts " \
                  "FROM information WHERE LENGTH(idcard)='18'"
 
     idcardSQL = sqlContext.sql(idcard_str)
@@ -98,15 +95,16 @@ if __name__ == "__main__":
     provinceCollect = idcardSQL.groupBy("province_code").count().collect()
     result_privince(provinceCollect, count)
 
-    birthdayCollect = idcardSQL.groupBy("birth_year").count().collect()
-    print birthdayCollect
-
     ageCollect = idcardSQL.groupBy("age").count().collect()
     print ageCollect
 
     # 性别分布
     genderCollect = idcardSQL.groupBy("gender").count().collect()
-    result_output(genderCollect)
+    result_gender(genderCollect)
+
+    # 手机运营商分布
+    phoneOptsCollect = idcardSQL.groupBy("phone_opts").count().collect()
+    result_phoneOpts(phoneOptsCollect)
 
     idcardSQL.show()
 
